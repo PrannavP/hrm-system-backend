@@ -1,16 +1,25 @@
 // this code is basically rules set for validating checkin / checkout. if the users lat & long is between the specified rules
 // then they can checkin/checkout. if not they cant.
 
-const officeBounds = {
-    topLeft: { lat: 27.7079, lng: 85.3199 },
-    bottomLeft: { lat: 27.7058, lng: 85.3199 },
-    topRight: { lat: 27.7079, lng: 85.3227 },
-    bottomRight: { lat: 27.7058, lng: 85.3227 }
-};
+const officeBounds = [
+    { lat: 27.708000, lng: 85.316859 },
+    { lat: 27.707815, lng: 85.325077 },
+    { lat: 27.705450, lng: 85.325169 },
+    { lat: 27.706172, lng: 85.316543 }
+];
 
 export const isInsideOffice = (latitude: number, longitude: number): boolean => {
-    return (
-        latitude >= officeBounds.bottomLeft.lat && latitude <= officeBounds.topLeft.lat &&
-        longitude >= officeBounds.bottomLeft.lng && longitude <= officeBounds.bottomRight.lng
-    );
+    let x = longitude, y = latitude;
+
+    let inside = false;
+    for (let i = 0, j = officeBounds.length - 1; i < officeBounds.length; j = i++) {
+        let xi = officeBounds[i].lng, yi = officeBounds[i].lat;
+        let xj = officeBounds[j].lng, yj = officeBounds[j].lat;
+
+        let intersect = ((yi > y) !== (yj > y)) &&
+            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
 };
