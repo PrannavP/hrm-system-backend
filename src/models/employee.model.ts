@@ -17,3 +17,14 @@ export const comparePassword = async (inputPassword: string, storedPassword: str
     const bcrypt = require('bcryptjs');
     return bcrypt.compare(inputPassword, storedPassword);
 };
+
+
+export const getEmployeeProfileById = async(emp_table_id: number) => {
+    console.log(emp_table_id);
+
+    const result = await pool.query(
+        `SELECT emp_id, first_name, last_name, email, department, role, join_date FROM employees WHERE id = $1`,
+        [emp_table_id]
+    );
+    return result.rows[0];
+};

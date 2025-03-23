@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken'; // Correct import for jsonwebtoken
 import bcrypt from 'bcryptjs';
 import { config } from '../config/db';
-import { getEmployeeByEmail, createEmployee, comparePassword } from '../models/employee.model';
+import { getEmployeeByEmail, createEmployee, comparePassword, getEmployeeProfileById } from '../models/employee.model';
 
 // Define the types for the request bodies
 interface LoginRequestBody {
@@ -41,6 +41,7 @@ export const login = async (req: Request, res: Response) => {
     const payload = {
         emp_id: employee.emp_id,
         email: employee.email,
+        id: employee.id,
     };
 
     // Ensure the jwtSecret is defined and fallback to a default if undefined
@@ -81,3 +82,19 @@ export const register = async (req: Request<{}, {}, RegisterRequestBody>, res: R
     // Send response confirming successful registration
     res.status(201).json({ message: 'Employee registered successfully', _id: newEmployee.id });
 };
+
+// Get employees profile by id
+export const getEmployeeProfile = async(req: Request, res:Response) => {
+    try{
+        const { emp_table_id } = req.body;
+
+        console.log(emp_table_id);
+
+        const employeeProfileData = await getEmployeeProfileById(emp_table_id);
+
+        res.status(200).json(employeeProfileData);
+    }catch(error){
+        console.log("Error while getting emplogyee from emp_table_id", error);
+        res.status(500).json({ message: "Error getting employee profile", error });
+    }
+}
