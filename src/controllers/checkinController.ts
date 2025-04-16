@@ -11,9 +11,6 @@ export const checkIn = async (req: Request, res: Response) => {
     }
 
     if (isInsideOffice(latitude, longitude)) {
-        console.log("success check in")
-
-        // testing stuffs
         try{
             const attendance = await AttendanceModel.checkIn(emp_id);
             res.status(200).json({ message: "Checked in successfully", attendance });
@@ -26,24 +23,33 @@ export const checkIn = async (req: Request, res: Response) => {
 };
 
 export const checkOut = async(req: Request, res: Response) => {
-    const { latitude, longitude, emp_id } = req.body;
+    // const { latitude, longitude, emp_id } = req.body;
 
-    if (!latitude || !longitude) {
-        res.status(400).json({ message: "Latitude and Longitude are required." });
-        return;
-    }
+    // if (!latitude || !longitude) {
+    //     res.status(400).json({ message: "Latitude and Longitude are required." });
+    //     return;
+    // }
 
-    if (isInsideOffice(latitude, longitude)) {
-        console.log("success check out")
+    // if (isInsideOffice(latitude, longitude)) {
+    //     console.log("success check out")
 
-        // testing stuffs
-        try{
-            const attendance = await AttendanceModel.checkOut(emp_id);
-            res.status(200).json({ message: "Checked out successfully", attendance });
-        }catch(err){
-            res.status(500).json({ error: "Error storing checkin in database." });
-        }
-    } else {
-        res.status(403).json({ message: "Check-out failed. You are not in the office location." });
+    //     // testing stuffs
+    //     try{
+    //         const attendance = await AttendanceModel.checkOut(emp_id);
+    //         res.status(200).json({ message: "Checked out successfully", attendance });
+    //     }catch(err){
+    //         res.status(500).json({ error: "Error storing checkin in database." });
+    //     }
+    // } else {
+    //     res.status(403).json({ message: "Check-out failed. You are not in the office location." });
+    // }
+
+    const { emp_id } = req.body;
+
+    try{
+        const attendance = await AttendanceModel.checkOut(emp_id);
+        res.status(200).json({ message: "Checked out successfully" });
+    }catch(err){
+        res.status(500).json({error: "Checkout failed. Please try again" });
     }
 };

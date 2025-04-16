@@ -10,6 +10,9 @@ interface Leave {
 
 export const createNewLeaves = async (leave: Leave): Promise<Leave> => {
     const { leave_type, starting_date, ending_date, emp_id, reason } = leave;
+
+    // console.log(leave_type, starting_date, ending_date, emp_id, reason);
+
     const result = await pool.query(
         `INSERT INTO leaves (leave_type, starting_date, ending_date, emp_id, reason)
         VALUES ($1, $2, $3, $4, $5) RETURNING *`,

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken'; // Correct import for jsonwebtoken
 import bcrypt from 'bcryptjs';
 import { config } from '../config/db';
-import { getEmployeeByEmail, createEmployee, comparePassword, getEmployeeProfileById } from '../models/employee.model';
+import { getEmployeeByEmail, createEmployee, comparePassword, getEmployeeProfileById, getEmployeeTotalLeaves, getEmployeeTotalPresent } from '../models/employee.model';
 
 // Define the types for the request bodies
 interface LoginRequestBody {
@@ -71,13 +71,13 @@ export const login = async (req: Request, res: Response) => {
 
 // Register function to create a new employee and store in the database
 export const register = async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
-    const { emp_id, first_name, last_name, email, password, department, role, join_date } = req.body;
+    const { emp_id, first_name, last_name, email, password, department, role } = req.body;
 
     // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new employee record in the database
-    const newEmployee = await createEmployee(emp_id, first_name, last_name, email, hashedPassword, department, role, join_date);
+    const newEmployee = await createEmployee(emp_id, first_name, last_name, email, hashedPassword, department, role);
 
     // Send response confirming successful registration
     res.status(201).json({ message: 'Employee registered successfully', _id: newEmployee.id });
@@ -97,4 +97,42 @@ export const getEmployeeProfile = async(req: Request, res:Response) => {
         console.log("Error while getting emplogyee from emp_table_id", error);
         res.status(500).json({ message: "Error getting employee profile", error });
     }
-}
+};
+
+// Get employees leaves data
+export const getLeavesOfEmployee = async(req:Request, res:Response) => {
+    try{
+        const { emp_id, thisMonth } = req.body;
+
+        if(thisMonth){
+            const employeeOneMonthLeaveCounts = await getEmployeeTotalLeaves(emp_id, true);
+
+            res.status(200).json(employeeOneMonthLeaveCounts);
+        }else{
+            const employeeLeavesData = await getEmployeeTotalLeaves(emp_id, false);
+
+            res.status(200).json(employeeLeavesData);
+        }
+    }catch(error){
+        console.log(`Error while getting employee leaves`, error);
+        res.status(500).json({ message: "Error getting employee leaves data" });
+    }
+};
+
+// Get employees attendance data
+export const getAttendanceDataOfEmployee = async(req: Request, res:Response) => {
+    try{
+        const { emp_id, thisMonth } = req.body;
+
+        if(thisMonth){
+            const employeeOneMonthPresentCounts = await getEmployeeTotalPresent(emp_id, true);
+            res.status(200).json(employeeOneMonthPresentCounts);
+        }else{
+            const employeeAttendanceData = await getEmployeeTotalPresent(emp_id, false);
+            res.status(200).json(employeeAttendanceData);
+        }
+    }catch(error){
+        console.log(`Error while getting employee attendance data`, error);
+        res.status(500).json({ message: "Error getting employee attendance data" });
+    }
+};
