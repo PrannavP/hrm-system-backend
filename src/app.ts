@@ -14,6 +14,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add this before your routes
+app.use('/uploads', express.static('uploads'));
+
 app.use("/api", checkinRoutes);
 app.use("/api", employeeRoutes);
 app.use("/api", attendanceRoutes);

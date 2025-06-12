@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken'; // Correct import for jsonwebtoken
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/db';
-import { getEmployeeByEmail, createEmployee, comparePassword, getEmployeeProfileById, getEmployeeTotalLeaves, getEmployeeTotalPresent } from '../models/employee.model';
+import { deleteEmployeeByEmpId, getEmployeeByEmail, createEmployee, comparePassword, getEmployeeProfileById, getEmployeeTotalLeaves, getEmployeeTotalPresent } from '../models/employee.model';
 
 // Define the types for the request bodies
 interface LoginRequestBody {
@@ -20,6 +20,27 @@ interface RegisterRequestBody {
   role: string;
   join_date: string; // Can also use Date if required
 }
+
+// delete employee function
+export const deleteEmployeeController = async (req: Request, res: Response) => {
+    try {
+        const { emp_id } = req.params;
+
+        // Call the model function to delete the employee
+        const employee = await deleteEmployeeByEmpId(emp_id);
+
+        // Check if the employee was found and deleted
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found to delete" });
+        }
+
+        // Respond with success if the employee was deleted
+        res.status(200).json({ message: "Employee deleted!" });
+    } catch (err) {
+        console.error("Error deleting employee:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 // Login function with JWT token generation
 export const login = async (req: Request, res: Response) => {
@@ -70,17 +91,38 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // Register function to create a new employee and store in the database
-export const register = async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
-    const { emp_id, first_name, last_name, email, password, department, role } = req.body;
+export const register = async (req: Request, res: Response) => {
+    try {
+      const { emp_id, first_name, last_name, email, password, department, role, phone_number, address } = req.body;
+      const imagePath = req.file ? req.file.path : null;
 
-    // Hash the password before saving it
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new employee record in the database
-    const newEmployee = await createEmployee(emp_id, first_name, last_name, email, hashedPassword, department, role);
-
-    // Send response confirming successful registration
-    res.status(201).json({ message: 'Employee registered successfully', _id: newEmployee.id });
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create employee with image path
+      const newEmployee = await createEmployee(
+        emp_id,
+        first_name,
+        last_name,
+        email,
+        hashedPassword,
+        department,
+        role,
+        phone_number,
+        address,
+        imagePath
+      );
+  
+      res.status(201).json({ 
+        message: 'Employee registered successfully', 
+        _id: newEmployee.id
+      });
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ 
+        message: error.message || 'Error registering employee' 
+      });
+    }
 };
 
 // Get employees profile by id

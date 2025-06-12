@@ -5,10 +5,21 @@ export const getEmployeeByEmail = async (email: string) => {
     return result.rows[0];
 };
 
-export const createEmployee = async (emp_id: string, first_name: string, last_name: string, email: string, password: string, department: string, role: string) => {
+export const createEmployee = async (
+    emp_id: string,
+    first_name: string,
+    last_name: string,
+    email: string,
+    password: string,
+    department: string,
+    role: string,
+    phone_number: string,
+    address: string,
+    image: string | null // Add image parameter
+  ) => {
     const result = await pool.query(
-        'INSERT INTO employees (emp_id, first_name, last_name, email, password, department, role) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-        [emp_id, first_name, last_name, email, password, department, role]
+      'INSERT INTO employees (emp_id, first_name, last_name, email, password, department, role, phone_number, address, image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
+      [emp_id, first_name, last_name, email, password, department, role, phone_number, address, image]
     );
     return result.rows[0];
 };
@@ -18,12 +29,11 @@ export const comparePassword = async (inputPassword: string, storedPassword: str
     return bcrypt.compare(inputPassword, storedPassword);
 };
 
-
 export const getEmployeeProfileById = async(emp_table_id: number) => {
     console.log(emp_table_id);
 
     const result = await pool.query(
-        `SELECT emp_id, first_name, last_name, email, department, role, join_date FROM employees WHERE id = $1`,
+        `SELECT * FROM employees WHERE id = $1`,
         [emp_table_id]
     );
     return result.rows[0];
@@ -52,6 +62,12 @@ export const getEmployeeTotalLeaves = async(emp_id: number, thisMonth: boolean) 
 
         return result.rows;
     }
+};
+
+// delete employee model
+export const deleteEmployeeByEmpId = async (emp_id: string) => {
+    const result = await pool.query(`DELETE FROM employees WHERE emp_id = $1 RETURNING *`, [emp_id]);
+    return result.rows[0];
 };
 
 // get employee total present days of a month or all present data

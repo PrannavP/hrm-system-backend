@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { config } from "../config/db";
 
-import { getAllEmployees, comparePassword, createHumanResource, getHrByEmail } from "../models/human_resource.model";
+import { getEmployeeByEid, getAllEmployees, comparePassword, createHumanResource, getHrByEmail } from "../models/human_resource.model";
 
 // HR login request bodies
 interface LoginRequestBody{
@@ -18,6 +18,24 @@ interface RegisterRequestBody{
     email: string;
     password: string;
 }
+
+// Get employee by emp_id
+export const getEmployeeByEidController = async (req:Request, res: Response) => {
+    try{
+        const { emp_id } = req.params;
+        
+        const employee = await getEmployeeByEid(emp_id);
+
+        if(!employee){
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        res.status(201).json({ employee });
+    }catch(err){
+        console.error("Error fetching employee by emp_id: ", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 // Get all employees controller function
 export const getAllEmployeesList = async (req: Request, res: Response) => {

@@ -27,7 +27,17 @@ export const comparePassword = async (inputPassword: string, storedPassword: str
 // Get all employees list
 export const getAllEmployees = async () => {
     const result = await pool.query(
-        'SELECT emp_id, first_name, last_name, email, department, role, join_date FROM employees'
+        'SELECT emp_id, first_name, last_name, email, department, role, image, join_date FROM employees'
     );
     return result.rows;
+};
+
+// Get employee by EID
+export const getEmployeeByEid = async (emp_id: string) => {
+    const result = await pool.query(
+        `SELECT * FROM employees WHERE emp_id = $1`,
+        [emp_id]
+    );
+
+    return result.rows[0];
 };
