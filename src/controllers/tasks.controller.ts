@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import {
     createTaskHr,
     getTasksByAssignedTo,
     updateTaskById,
     getAllTasksForHr,
+    getTaskByIdForHr,
 } from '../models/tasks';
 
 // Create a new task
@@ -83,6 +84,24 @@ export const getTasksByAssignedToController = async (
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
+    }
+};
+
+// Get task by task id
+export const getTaskByIdController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { task_id } = req.params;
+        console.log('taskcontroller: ', task_id);
+        if (!task_id) {
+            res.status(400).json({ message: 'Task Id parameter is required.' });
+            return;
+        }
+
+        const task = await getTaskByIdForHr(Number(task_id));
+        res.status(200).json({ task });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error', error: (error as Error).message });
     }
 };
 
