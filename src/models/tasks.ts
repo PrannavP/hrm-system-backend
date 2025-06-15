@@ -15,6 +15,15 @@ export const getAllTasksForHr = async () => {
     return result.rows;
 };
 
+// Model to get task by id
+export const getTaskByIdForHr = async (task_id: number) => {
+    const query = `SELECT * FROM tasks WHERE id = $1`;
+
+    const values = [task_id];
+    const result = await pool.query(query, values);
+    return result.rows;
+};
+
 // Model to create task by hr
 export const createTaskHr = async (
     title: string,

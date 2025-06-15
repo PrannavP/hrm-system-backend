@@ -1,13 +1,21 @@
-import { Request, Response } from "express";
-import { createNewLeaves, fetchLeavesByEmpId, fetchAllEmployeeLeaves, changeLeavesStatus, changeApprovedBy } from "../models/leaves.model";
+import { Request, Response } from 'express';
+import {
+    createNewLeaves,
+    fetchLeavesByEmpId,
+    fetchAllEmployeeLeaves,
+    changeLeavesStatus,
+    changeApprovedBy,
+} from '../models/leaves.model';
 
 export const askLeave = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { leave_type, starting_date, ending_date, emp_id, reason} = req.body;
+        const { leave_type, starting_date, ending_date, emp_id, reason } = req.body;
 
         // Validate required fields
         if (!leave_type || !starting_date || !emp_id || !reason) {
-            res.status(400).json({ message: "leave_type, starting_date, emp_id and reason are required." });
+            res.status(400).json({
+                message: 'leave_type, starting_date, emp_id and reason are required.',
+            });
         }
 
         // Create new leave
@@ -16,7 +24,7 @@ export const askLeave = async (req: Request, res: Response): Promise<void> => {
             starting_date,
             ending_date,
             emp_id,
-            reason
+            reason,
         });
 
         res.status(201).json(newLeave);
@@ -26,51 +34,51 @@ export const askLeave = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export const fetchLeavesByEmployeeId = async(req: Request, res: Response): Promise<void> => {
-    try{
+export const fetchLeavesByEmployeeId = async (req: Request, res: Response): Promise<void> => {
+    try {
         const { emp_id } = req.params;
-        console.log(emp_id);
+        console.log('emp_id leaves', emp_id);
 
         const fetchEmployeeLeaves = await fetchLeavesByEmpId(emp_id);
 
         res.status(200).json({ fetchEmployeeLeaves });
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal server error", error: (error as Error).message });
+        res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
     }
 };
 
-export const fetchAllEmployeesLeavesController = async(req: Request, res: Response) => {
-    try{
+export const fetchAllEmployeesLeavesController = async (req: Request, res: Response) => {
+    try {
         const allEmployeesLeaveRequests = await fetchAllEmployeeLeaves();
         res.status(200).json({ allEmployeesLeaveRequests });
-    }catch(err){
+    } catch (err) {
         console.log(err);
-        res.status(500).json({ message: "Internal server error", error: (err as Error).message });
+        res.status(500).json({ message: 'Internal server error', error: (err as Error).message });
     }
 };
 
 export const changeEmployeesLeavesStatusController = async (req: Request, res: Response) => {
-    try{
+    try {
         const { leave_id, status } = req.body;
         console.log(leave_id, status);
 
         const changedLeaveStatus = await changeLeavesStatus(Number(leave_id), status);
         res.status(201).json({ message: 'Leave status updated', changedLeaveStatus });
-    }catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error', err });
     }
 };
 
 export const changeApprovedByLeavesController = async (req: Request, res: Response) => {
-    try{
+    try {
         const { hr_email, leave_id } = req.body;
         console.log(hr_email, leave_id);
 
         await changeApprovedBy(hr_email, leave_id);
         res.status(201).json({ message: 'Leave details updated' });
-    }catch(err){
+    } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error', err });
     }
