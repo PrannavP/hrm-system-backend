@@ -9,6 +9,7 @@ import passwordResetRoutes from './routes/passwordResetRequestRoutes';
 import checkInTimerSync from './routes/timerRoutes';
 import humanResourcesRoutes from './routes/human_resourcesRoutes';
 import tasksRoutes from './routes/tasksRoute';
+import employeeAttritionRoutes from "./routes/employeeAttritionRoutes";
 
 const app = express();
 
@@ -30,5 +31,8 @@ app.use('/api', tasksRoutes);
 
 // human resources related routes
 app.use('/api', humanResourcesRoutes);
+
+// HR Employee Attrition Route
+app.use('/api', employeeAttritionRoutes);
 
 export default app;
