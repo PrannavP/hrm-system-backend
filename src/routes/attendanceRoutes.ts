@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/checkin", checkIn);
 router.post("/checkout", checkOut);
-router.get("/:emp_id", getAttendance);
+router.get("/attendance/:emp_id", getAttendance);
 
 export default router;
