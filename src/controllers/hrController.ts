@@ -3,7 +3,16 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { config } from "../config/db";
 
-import { getEmployeeByEid, getAllEmployees, comparePassword, createHumanResource, getHrByEmail } from "../models/human_resource.model";
+import { 
+    getEmployeeByEid,
+    getAllEmployees,
+    comparePassword,
+    createHumanResource,
+    getHrByEmail,
+    getRecentlyJoinedEmployees,
+    getHRDashboardActiveTasks,
+    getHRDashboardEmployeesOnLeave
+} from "../models/human_resource.model";
 
 // HR login request bodies
 interface LoginRequestBody{
@@ -18,6 +27,42 @@ interface RegisterRequestBody{
     email: string;
     password: string;
 }
+
+// Get recently joined employees controller (HR dashboard card data)
+export const getRecentlyJoinedEmployeesController = async(req: Request, res: Response) => {
+    try{
+        const recentlyJoinedEmployeesList = await getRecentlyJoinedEmployees();
+
+        return res.status(201).json({ recentlyJoinedEmployeesList });
+    }catch(err){
+        console.log("Error while fetching recently joined employees list.", err);
+        res.status(500).json({ message: "Error while fetching recently joined employees list." });
+    }
+};
+
+// Get active tasks controller (HR dashboard card data)
+export const getHRDashboardActiveTasksController = async(req: Request, res: Response) => {
+    try{
+        const activeTasksData = await getHRDashboardActiveTasks();
+
+        return res.status(201).json({ activeTasksData });
+    }catch(err){
+        console.log("Error while fetching active tasks list.", err);
+        res.status(500).json({ message: "Error while fetching active tasks list." });
+    }
+};
+
+// Get employees on leave for that day controller (HR dashboard card data)
+export const getEmployeesOnLeaveController = async(req: Request, res: Response) => {
+    try{
+        const employeesOnLeaveData = await getHRDashboardEmployeesOnLeave();
+
+        return res.status(201).json({ employeesOnLeaveData });
+    }catch(err){
+        console.log("Error while fetching employees on leave list.", err);
+        res.status(500).json({ message: "Error while fetching employees on leave list." });
+    }
+};
 
 // Get employee by emp_id
 export const getEmployeeByEidController = async (req:Request, res: Response) => {

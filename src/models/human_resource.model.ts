@@ -41,3 +41,49 @@ export const getEmployeeByEid = async (emp_id: string) => {
 
     return result.rows[0];
 };
+
+// HR Dashboard recently joined employees (last 1 month) list
+export const getRecentlyJoinedEmployees = async () => {
+    const result = await pool.query(
+        `
+            SELECT emp_id, first_name, last_name, department
+            FROM employees
+            WHERE join_date >= CURRENT_DATE - INTERVAL '1 month';
+        `
+    );
+
+    return result.rows;
+};
+
+// HR Dashboard active tasks list
+export const getHRDashboardActiveTasks = async () => {
+    const result = await pool.query(
+        `
+            SELECT title, priority, status, due_date
+            FROM tasks
+            WHERE status = 'Pending' OR status = 'In Progress'
+            LIMIT 7
+        `
+    );
+
+    return result.rows;
+};
+
+// HR Dashboard employees on leave on that day list
+export const getHRDashboardEmployeesOnLeave = async () => {
+    const result = await pool.query(
+        `
+            SELECT 
+                e.first_name || ' ' || e.last_name AS employee_name,
+                l.leave_type
+            FROM 
+                leaves l
+            JOIN 
+                employees e ON l.emp_id = e.emp_id
+            WHERE 
+                CURRENT_DATE BETWEEN l.starting_date AND l.ending_date;
+        `
+    );
+
+    return result.rows;
+};
