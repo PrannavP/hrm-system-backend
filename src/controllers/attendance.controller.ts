@@ -30,3 +30,13 @@ export const getAttendance = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Error fetching attendance" });
     }
 };
+
+// Get all attendance of employees for HR Attendance page
+export const getAllEmployeeAttendance = async (req: Request, res: Response) => {
+    try{
+        const employeesAttendanceList = await AttendanceModel.getAllAttendance();
+        res.status(200).json(employeesAttendanceList);
+    }catch(error){
+        res.status(500).json({ error });
+    }
+};

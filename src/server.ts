@@ -3,12 +3,17 @@ import { resetAndSeedDatabase } from "./utils/seed";
 
 const PORT = process.env.PORT || 5000;
 
-resetAndSeedDatabase().then(() => {
+const startServer = async () => {
+    if (process.env.SEED_DB === 'true') {
+        await resetAndSeedDatabase();
+        console.log('Database seeded and ready!');
+    }
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
-        console.log('Database seeded and ready!');
     });
-}).catch((err) => {
-    console.error('Error seeding database:', err);
+};
+
+startServer().catch((err) => {
+    console.error('Error starting server:', err);
     process.exit(1);
 });
