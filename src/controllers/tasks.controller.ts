@@ -5,6 +5,7 @@ import {
     updateTaskById,
     getAllTasksForHr,
     getTaskByIdForHr,
+    getTaskByAssignedToAndTaskId,
 } from '../models/tasks';
 
 // Create a new task
@@ -80,6 +81,25 @@ export const getTasksByAssignedToController = async (
             return;
         }
         const tasks = await getTasksByAssignedTo(Number(assigned_to));
+        res.status(200).json({ tasks });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
+    }
+};
+
+// Get task by assigned_to and task_id
+export const getTaskByAssignedToAndTaskIdController = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { assigned_to, task_id } = req.params;
+        if (!assigned_to && !task_id) {
+            res.status(400).json({ message: 'assigned_to parameter and task_id parameter is required.' });
+            return;
+        }
+        const tasks = await getTaskByAssignedToAndTaskId(Number(assigned_to), Number(task_id));
         res.status(200).json({ tasks });
     } catch (error) {
         console.error(error);

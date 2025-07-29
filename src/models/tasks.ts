@@ -68,6 +68,16 @@ export const createTaskHr = async (
     return result.rows[0];
 };
 
+// Model to get task by assigned_to (employee) and task id
+export const getTaskByAssignedToAndTaskId = async (assigned_to: number, task_id: number) => {
+    const query = `
+        SELECT * FROM tasks WHERE id = $1 AND assigned_to = $2;
+    `;
+    const values = [assigned_to, task_id];
+    const result = await pool.query(query, values);
+    return result.rows;
+};
+
 // Model to get task by assigned_to (employee)
 export const getTasksByAssignedTo = async (assigned_to: number) => {
     const query = `
